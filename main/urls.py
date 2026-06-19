@@ -9,4 +9,5 @@ urlpatterns = [
     path('application/', views.ApplicationCreateView.as_view(), name='application'),
     path('admin-panel/', views.admin_panel, name='admin_panel'),
     path('', views.UserLoginView.as_view(), name='home'),
+    path('review/<int:app_id>/', views.add_review, name='review'),
 ]

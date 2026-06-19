@@ -4,8 +4,8 @@ from django.views.generic import CreateView, ListView
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-from .forms import RegisterForm, ApplicationForm
-from .models import Application
+from .forms import *
+from .models import *
 
 
 class RegisterView(CreateView):
@@ -64,3 +64,27 @@ def admin_panel(request):
         return redirect('admin_panel')
 
     return render(request, 'admin_panel.html', {'applications': applications})
+
+@login_required
+def add_review(request, app_id):
+
+    app = get_object_or_404(Application, id=app_id, user=request.user)
+
+    if app.status == 'new':
+        return redirect('dashboard')
+
+    if Review.objects.filter(application=app, user=request.user).exists():
+        return redirect('dashboard')
+    
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.user = request.user
+            review.application = app
+            review.save()
+            return redirect('dashboard')
+    else:
+        form = ReviewForm()
+    
+    return render(request, 'review.html', {'form': form, 'app': app})

@@ -65,3 +65,27 @@ class Application(models.Model):
 
     def __str__(self):
         return f'{self.user.full_name} — {self.get_transport_display()}'
+
+class Review(models.Model):
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        verbose_name='Пользователь'
+    )
+    application = models.ForeignKey(
+        Application,
+        on_delete=models.CASCADE,
+        verbose_name='Заявка',
+        related_name='reviews'
+    )
+    text = models.TextField('Текст отзыва')
+    created_at = models.DateTimeField('Создано', auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'Отзыв от {self.user.full_name}'
