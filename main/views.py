@@ -26,13 +26,20 @@ class UserLogoutView(LogoutView):
 
 
 class DashboardView(LoginRequiredMixin, ListView):
-    """Личный кабинет — история заявок"""
     model = Application
     template_name = 'dashboard.html'
     context_object_name = 'applications'
 
     def get_queryset(self):
         return Application.objects.filter(user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['reviewed_ids'] = list(
+            Review.objects.filter(user=self.request.user)
+            .values_list('application_id', flat=True)
+        )
+        return context
 
 
 class ApplicationCreateView(LoginRequiredMixin, CreateView):

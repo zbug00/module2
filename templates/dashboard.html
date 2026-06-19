@@ -3,6 +3,18 @@
 <h1>Личный кабинет</h1>
 <p class="aux">Привет, {{ user.full_name }}!</p>
 
+<div class="slider">
+    <div class="slides" id="slides">
+        <img src="/media/slider/s1.jpg" alt="Слайд 1">
+        <img src="/media/slider/s2.jpg" alt="Слайд 2">
+        <img src="/media/slider/s3.jpg" alt="Слайд 3">
+        <img src="/media/slider/s4.jpg" alt="Слайд 4">
+    </div>
+    <button class="slider-btn prev" onclick="moveSlide(-1)">‹</button>
+    <button class="slider-btn next" onclick="moveSlide(1)">›</button>
+    <div class="slider-dots" id="dots"></div>
+</div>
+
 <a href="{% url 'application' %}" class="btn" style="margin-top:16px">Новая заявка</a>
 
 {% if user.username == 'Admin26' %}
@@ -12,11 +24,65 @@
 <h2 style="margin-top:20px">Мои заявки</h2>
 {% for app in applications %}
 <div class="card">
-    <h3>{{ app.get_transport_display }}</h3>
-    <p>{{ app.start_date|date:"d.m.Y" }} · {{ app.get_payment_display }}</p>
-    <p class="aux">Статус: {{ app.get_status_display }}</p>
+    <div class="card-header">
+        <h3>{{ app.get_transport_display }}</h3>
+        <span class="status-badge status-{{ app.status }}">
+            {{ app.get_status_display }}
+        </span>
+    </div>
+    <p class="aux">{{ app.start_date|date:"d.m.Y" }} · {{ app.get_payment_display }}</p>
+    
+    {% if app.status != 'new' %}
+        {% if app.id in reviewed_ids %}
+            <p class="aux" style="margin-top:8px">Отзыв оставлен</p>
+        {% else %}
+            <a href="{% url 'review' app.id %}" class="btn btn-small" style="margin-top:8px">
+                Оставить отзыв
+            </a>
+        {% endif %}
+    {% else %}
+        <p class="aux" style="margin-top:8px">Ожидает обработки администратором</p>
+    {% endif %}
 </div>
 {% empty %}
-<p class="aux">У вас пока нет заявок</p>
+<div class="empty-state">
+    <p class="aux">У вас пока нет заявок</p>
+    <a href="{% url 'application' %}" class="btn">Создать первую заявку</a>
+</div>
 {% endfor %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+const slides = document.getElementById('slides');
+const totalSlides = slides.children.length;
+let currentSlide = 0;
+const dotsContainer = document.getElementById('dots');
+
+for (let i = 0; i < totalSlides; i++) {
+    const dot = document.createElement('span');
+    dot.className = 'dot' + (i === 0 ? ' active' : '');
+    dot.onclick = () => goToSlide(i);
+    dotsContainer.appendChild(dot);
+}
+
+function updateSlider() {
+    slides.style.transform = `translateX(-${currentSlide * 100}%)`;
+    document.querySelectorAll('.dot').forEach((d, i) => {
+        d.classList.toggle('active', i === currentSlide);
+    });
+}
+
+function moveSlide(n) {
+    currentSlide = (currentSlide + n + totalSlides) % totalSlides;
+    updateSlider();
+}
+
+function goToSlide(i) {
+    currentSlide = i;
+    updateSlider();
+}
+
+setInterval(() => moveSlide(1), 3000);
+</script>
 {% endblock %}

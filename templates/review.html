@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Отзыв</h1>
+<div class="card" style="margin-bottom:16px">
+    <h3>{{ app.get_transport_display }}</h3>
+    <p class="aux">{{ app.start_date|date:"d.m.Y" }} · Статус: {{ app.get_status_display }}</p>
+</div>
+
+<form method="post">
+    {% csrf_token %}
+    <label>Ваш отзыв</label>
+    {{ form.text }}
+    {% for e in form.text.errors %}<div class="error">{{ e }}</div>{% endfor %}
+    <button class="btn" type="submit">Отправить отзыв</button>
+</form>
+<a href="{% url 'dashboard' %}" class="aux" style="display:block;margin-top:12px">Назад в ЛК</a>
+{% endblock %}
