@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Заявка на обучение</h1>
+<form method="post">
+    {% csrf_token %}
+    {% for field in form %}
+        <label>{{ field.label }}</label>
+        {{ field }}
+        {% for e in field.errors %}<div class="error">{{ e }}</div>{% endfor %}
+    {% endfor %}
+    <button class="btn" type="submit">Отправить заявку</button>
+</form>
+<a href="{% url 'dashboard' %}" class="aux">← Назад в ЛК</a>
+{% endblock %}

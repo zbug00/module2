@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Личный кабинет</h1>
+<p class="aux">Привет, {{ user.full_name }}!</p>
+
+<a href="{% url 'application' %}" class="btn" style="margin-top:16px">Новая заявка</a>
+
+{% if user.username == 'Admin26' %}
+<a href="{% url 'admin_panel' %}" class="btn">Админ-панель</a>
+{% endif %}
+
+<h2 style="margin-top:20px">Мои заявки</h2>
+{% for app in applications %}
+<div class="card">
+    <h3>{{ app.get_transport_display }}</h3>
+    <p>{{ app.start_date|date:"d.m.Y" }} · {{ app.get_payment_display }}</p>
+    <p class="aux">Статус: {{ app.get_status_display }}</p>
+</div>
+{% empty %}
+<p class="aux">У вас пока нет заявок</p>
+{% endfor %}
+{% endblock %}

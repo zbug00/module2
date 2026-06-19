@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Регистрация</h1>
+<form method="post" novalidate>
+    {% csrf_token %}
+    {% for field in form %}
+        <label>{{ field.label }}</label>
+        {{ field }}
+        {% for e in field.errors %}<div class="error">{{ e }}</div>{% endfor %}
+    {% endfor %}
+    <button class="btn" type="submit">Зарегистрироваться</button>
+</form>
+<p class="aux" style="margin-top:12px">
+    Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a>
+</p>
+{% endblock %}

@@ -1,0 +1,67 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'PT Sans', sans-serif;
+    background: #f8f9fa;
+    color: #333;
+    font-size: 16px;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.container {
+    width: 390px;
+    min-height: 844px;
+    background: #ffffff;
+    padding: 20px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+
+h1 { font: bold 36px 'PT Sans'; color: #0d47a1; margin-bottom: 16px; }
+h2 { font: bold 24px 'PT Sans'; color: #0d47a1; margin-bottom: 12px; }
+h3 { font: bold 18px 'PT Sans'; color: #0d47a1; margin-bottom: 8px; }
+
+p, label { font-size: 16px; }
+.aux { font: italic 12px 'PT Sans'; color: #6c757d; }
+
+input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #6c757d;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font: 16px 'PT Sans';
+}
+
+.btn {
+    display: block;
+    width: 100%;
+    background: #007bff;
+    color: #ffffff;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font: 16px 'PT Sans';
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    margin-bottom: 12px;
+}
+.btn:hover { background: #0d47a1; }
+
+.card {
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.error {
+    color: red;
+    font: italic 12px 'PT Sans';
+    margin-bottom: 8px;
+}
+
+.nav { margin-bottom: 16px; text-align: right; }
+.nav a { color: #007bff; text-decoration: none; font-size: 14px; }

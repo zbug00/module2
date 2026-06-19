@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Вход</h1>
+<form method="post">
+    {% csrf_token %}
+    {% if form.errors %}
+        <div class="error">Неверный логин или пароль</div>
+    {% endif %}
+    {% for field in form %}
+        <label>{{ field.label }}</label>
+        {{ field }}
+    {% endfor %}
+    <button class="btn" type="submit">Войти</button>
+</form>
+<p class="aux" style="margin-top:12px">
+    Еще не зарегистрированы? <a href="{% url 'register' %}">Регистрация</a>
+</p>
+{% endblock %}
