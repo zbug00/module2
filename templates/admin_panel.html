@@ -1,14 +1,47 @@
 {% extends 'base.html' %}
 {% block content %}
 <h1>Админ-панель</h1>
-<p class="aux">Всего заявок: {{ applications|length }}</p>
+<p class="aux">Всего заявок: {{ page_obj.paginator.count }}</p>
 
-{% for app in applications %}
+<form method="get" class="filters">
+    <div class="filter-row">
+        <label class="aux">Статус:</label>
+        <select name="status">
+            <option value="">Все</option>
+            <option value="new" {% if status_filter == 'new' %}selected{% endif %}>Новая</option>
+            <option value="learning" {% if status_filter == 'learning' %}selected{% endif %}>Идет обучение</option>
+            <option value="done" {% if status_filter == 'done' %}selected{% endif %}>Завершено</option>
+        </select>
+    </div>
+    <div class="filter-row">
+        <label class="aux">Транспорт:</label>
+        <select name="transport">
+            <option value="">Все</option>
+            <option value="bus" {% if transport_filter == 'bus' %}selected{% endif %}>Автобус</option>
+            <option value="electric" {% if transport_filter == 'electric' %}selected{% endif %}>Электробус</option>
+            <option value="tram" {% if transport_filter == 'tram' %}selected{% endif %}>Трамвай</option>
+        </select>
+    </div>
+    <div class="filter-row">
+        <label class="aux">Сортировка:</label>
+        <select name="sort">
+            <option value="-created_at" {% if sort == '-created_at' %}selected{% endif %}>Новые сначала</option>
+            <option value="created_at" {% if sort == 'created_at' %}selected{% endif %}>Старые сначала</option>
+            <option value="start_date" {% if sort == 'start_date' %}selected{% endif %}>По дате начала ↑</option>
+            <option value="-start_date" {% if sort == '-start_date' %}selected{% endif %}>По дате начала ↓</option>
+        </select>
+    </div>
+    <button class="btn" type="submit">Применить</button>
+</form>
+
+{% for app in page_obj %}
 <div class="card">
-    <h3>{{ app.user.full_name }}</h3>
+    <div class="card-header">
+        <h3>{{ app.user.full_name }}</h3>
+        <span class="status-badge status-{{ app.status }}">{{ app.get_status_display }}</span>
+    </div>
     <p class="aux">{{ app.get_transport_display }} · {{ app.start_date|date:"d.m.Y" }}</p>
-    <p class="aux">Оплата: {{ app.get_payment_display }}</p>
-    <p><strong>Статус: {{ app.get_status_display }}</strong></p>
+    <p class="aux">{{ app.get_payment_display }} · {{ app.user.email }}</p>
 
     <form method="post" style="margin-top:8px">
         {% csrf_token %}
@@ -18,10 +51,47 @@
             <option value="learning" {% if app.status == 'learning' %}selected{% endif %}>Идет обучение</option>
             <option value="done" {% if app.status == 'done' %}selected{% endif %}>Обучение завершено</option>
         </select>
-        <button class="btn" type="submit" style="margin-top:8px">Сменить статус</button>
+        <button class="btn btn-small" type="submit">Сменить</button>
     </form>
 </div>
 {% empty %}
-<p class="aux">Заявок пока нет</p>
+<p class="aux">Заявок по выбранным фильтрам не найдено</p>
 {% endfor %}
+
+{% if page_obj.paginator.num_pages > 1 %}
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?{{ query_string }}&page={{ page_obj.previous_page_number }}" class="page-btn">‹</a>
+    {% endif %}
+    
+    {% for num in page_obj.paginator.page_range %}
+        {% if num == page_obj.number %}
+            <span class="page-btn active">{{ num }}</span>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?{{ query_string }}&page={{ num }}" class="page-btn">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+    
+    {% if page_obj.has_next %}
+        <a href="?{{ query_string }}&page={{ page_obj.next_page_number }}" class="page-btn">›</a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% if notified %}
+<div class="popup-overlay" id="popup">
+    <div class="popup">
+        <div class="popup-icon"></div>
+        <h3>Успешно!</h3>
+        <p>{{ message }}</p>
+        <button class="btn" onclick="closePopup()">OK</button>
+    </div>
+</div>
+<script>
+function closePopup() {
+    document.getElementById('popup').style.display = 'none';
+    history.replaceState(null, '', '/admin-panel/');
+}
+</script>
+{% endif %}
 {% endblock %}

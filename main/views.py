@@ -4,24 +4,22 @@ from django.views.generic import CreateView, ListView
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from .forms import *
 from .models import *
 
 
 class RegisterView(CreateView):
-    """Регистрация нового пользователя"""
     form_class = RegisterForm
     template_name = 'register.html'
     success_url = reverse_lazy('login')
 
 
 class UserLoginView(LoginView):
-    """Вход в систему"""
     template_name = 'login.html'
 
 
 class UserLogoutView(LogoutView):
-    """Выход из системы"""
     next_page = 'login'
 
 
@@ -56,21 +54,52 @@ class ApplicationCreateView(LoginRequiredMixin, CreateView):
 
 @login_required
 def admin_panel(request):
-    """Панель администратора (только для Admin26)"""
     if request.user.username != 'Admin26':
         return redirect('dashboard')
 
-    applications = Application.objects.all()
+    applications = Application.objects.select_related('user').all()
 
+    status_filter = request.GET.get('status', '')
+    transport_filter = request.GET.get('transport', '')
+    if status_filter:
+        applications = applications.filter(status=status_filter)
+    if transport_filter:
+        applications = applications.filter(transport=transport_filter)
+
+    sort = request.GET.get('sort', '-created_at')
+    allowed_sorts = ['created_at', '-created_at', 'start_date', '-start_date', 'status']
+    if sort in allowed_sorts:
+        applications = applications.order_by(sort)
+
+    notified = False
     if request.method == 'POST':
         app_id = request.POST.get('app_id')
         new_status = request.POST.get('status')
         app = get_object_or_404(Application, id=app_id)
+        old_status = app.get_status_display()
         app.status = new_status
         app.save()
-        return redirect('admin_panel')
+        notified = True
+        return redirect(f'/admin-panel/?notified=1&msg=Статус+изменён:+{old_status}+→+{app.get_status_display()}')
 
-    return render(request, 'admin_panel.html', {'applications': applications})
+    paginator = Paginator(applications, 5)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    query_params = request.GET.copy()
+    if 'page' in query_params:
+        query_params.pop('page')
+
+    context = {
+        'page_obj': page_obj,
+        'status_filter': status_filter,
+        'transport_filter': transport_filter,
+        'sort': sort,
+        'query_string': query_params.urlencode(),
+        'notified': request.GET.get('notified') == '1',
+        'message': request.GET.get('msg', ''),
+    }
+    return render(request, 'admin_panel.html', context)
 
 @login_required
 def add_review(request, app_id):

@@ -3,14 +3,26 @@
 <h1>Регистрация</h1>
 <form method="post" novalidate>
     {% csrf_token %}
+    {% if form.non_field_errors %}
+        <div class="error" style="margin-bottom:12px">
+            {% for e in form.non_field_errors %}{{ e }}<br>{% endfor %}
+        </div>
+    {% endif %}
     {% for field in form %}
-        <label>{{ field.label }}</label>
-        {{ field }}
-        {% for e in field.errors %}<div class="error">{{ e }}</div>{% endfor %}
+        <div class="form-group">
+            <label>{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}
+                <p class="aux">{{ field.help_text }}</p>
+            {% endif %}
+            {% for e in field.errors %}
+                <div class="error">⚠ {{ e }}</div>
+            {% endfor %}
+        </div>
     {% endfor %}
     <button class="btn" type="submit">Зарегистрироваться</button>
 </form>
-<p class="aux" style="margin-top:12px">
+<p class="aux" style="margin-top:12px;text-align:center">
     Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a>
 </p>
 {% endblock %}

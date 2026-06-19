@@ -4,7 +4,9 @@
 <form method="post">
     {% csrf_token %}
     {% if form.errors %}
-        <div class="error">Неверный логин или пароль</div>
+        <div class="error-box">
+            Неверный логин или пароль. Попробуйте снова.
+        </div>
     {% endif %}
     {% for field in form %}
         <label>{{ field.label }}</label>
@@ -12,7 +14,7 @@
     {% endfor %}
     <button class="btn" type="submit">Войти</button>
 </form>
-<p class="aux" style="margin-top:12px">
+<p class="aux" style="margin-top:12px;text-align:center">
     Еще не зарегистрированы? <a href="{% url 'register' %}">Регистрация</a>
 </p>
 {% endblock %}

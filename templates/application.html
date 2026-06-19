@@ -10,5 +10,19 @@
     {% endfor %}
     <button class="btn" type="submit">Отправить заявку</button>
 </form>
-<a href="{% url 'dashboard' %}" class="aux">← Назад в ЛК</a>
+<a href="{% url 'dashboard' %}" class="aux" style="display:block;margin-top:12px">Назад в ЛК</a>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const dateInput = document.querySelector('input[name="start_date"]');
+if (dateInput) {
+    dateInput.addEventListener('input', function(e) {
+        let v = e.target.value.replace(/\D/g, '');
+        if (v.length > 2) v = v.slice(0,2) + '.' + v.slice(2);
+        if (v.length > 5) v = v.slice(0,5) + '.' + v.slice(5,9);
+        e.target.value = v;
+    });
+}
+</script>
 {% endblock %}
